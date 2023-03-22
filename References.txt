@@ -1,0 +1,13 @@
+https://www.geeksforgeeks.org/difference-between-informed-and-uninformed-search-in-ai/
+
+https://byjus.com/gate/difference-between-informed-and-uninformed-search-in-ai/
+
+https://en.wikipedia.org/wiki/A*_search_algorithm
+
+https://en.wikipedia.org/wiki/Consistent_heuristic
+
+https://www.javatpoint.com/heuristic-techniques
+
+
+// uy tinnnnnnn
+https://www.javatpoint.com/ai-uninformed-search-algorithms
