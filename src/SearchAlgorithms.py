@@ -1,10 +1,11 @@
 from Space import *
 from Constants import *
+import math as math_
+from time import *
 
-
-def set_Color_Path(g: Graph, path, sc: pygame.surface):
+def setColorPath(g: Graph, path, sc: pygame.surface):
     g.goal.set_color(purple)
-    g.draw(sc)
+    drawNode(g.goal, sc)
     child = g.goal.value
     while child != g.start.value:
         pygame.draw.line(sc, green, (g.grid_cells[child].x, g.grid_cells[child].y), (
@@ -14,9 +15,43 @@ def set_Color_Path(g: Graph, path, sc: pygame.surface):
         g.grid_cells[child].set_color(grey)
         g.draw(sc)
     g.start.set_color(orange)
-    g.draw(sc)
+    drawNode(g.start, sc)
+
+def CostTwoNode(a: Node, b: Node):
+    cost = math_.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y))
+    return cost
 
 
+def getNodeMinCost(open_set: list[Node], g: Graph, cost: list[Node]):
+    min = g.get_len() # min = len of graph
+    temp = open_set[0] # temp = first node
+    for i in open_set:
+        if cost[i.value] < min:
+            min = cost[i.value]
+            temp = i
+    return temp
+
+def getHeuristic(g: Graph, a: Node):
+    goal = g.goal
+    cost = int(math_.sqrt((a.x - goal.x)**2 + (a.y - goal.y)**2))
+    return cost
+
+def getNodeMinCostHeuristic(open_set: list[Node], g: Graph, cost: list[Node]):
+    min = 10**8 
+    temp = open_set[0] # temp = first node
+    for i in open_set:
+        if (cost[i.value] + getHeuristic(g, i)) < min:
+            min = cost[i.value] + getHeuristic(g, i)
+            temp = i
+    return temp
+
+
+def drawNode(node: Node, sc: pygame.Surface):
+    node.draw(sc)
+    pygame.display.flip()
+    sleep(0.1)
+
+# Implement algorithms
 def DFS(g: Graph, sc: pygame.Surface):
     print('Implement DFS algorithm')
 
@@ -28,24 +63,24 @@ def DFS(g: Graph, sc: pygame.Surface):
 
     # draw start node
     g.start.set_color(orange)
-    g.draw(sc)
+    drawNode(g.start, sc)
     while open_set:
 
         # draw current node
         currentNode = open_set.pop(0)
         currentNode.set_color(yellow)
-        g.draw(sc)
+        drawNode(currentNode, sc)
 
         # append closed node
         closed_set.append(currentNode)
 
         currentNode.set_color(blue)
-        g.draw(sc)
+        drawNode(currentNode, sc)
 
         # Check if current node is goal
         if g.is_goal(currentNode):
             currentNode.set_color(purple)
-            set_Color_Path(g, father, sc)
+            setColorPath(g, father, sc)
             return
 
         # list new neighbors
@@ -54,7 +89,7 @@ def DFS(g: Graph, sc: pygame.Surface):
             if neighbor not in closed_set and neighbor not in open_set:
                 if neighbor.value != g.goal.value:
                     neighbor.set_color(red)
-                    g.draw(sc)
+                    drawNode(neighbor, sc)
                 father[neighbor.value] = currentNode.value
                 newNeighbors.append(neighbor)
 
@@ -73,24 +108,24 @@ def BFS(g: Graph, sc: pygame.Surface):
 
     # draw start node
     g.start.set_color(orange)
-    g.draw(sc)
+    drawNode(g.start, sc)
     while open_set:
 
         # draw current node
         currentNode = open_set.pop(0)
         currentNode.set_color(yellow)
-        g.draw(sc)
+        drawNode(currentNode, sc)
 
         # append closed node
         closed_set.append(currentNode)
 
         currentNode.set_color(blue)
-        g.draw(sc)
+        drawNode(currentNode, sc)
 
         # Check if current node is goal
         if g.is_goal(currentNode):
             currentNode.set_color(purple)
-            set_Color_Path(g, father, sc)
+            setColorPath(g, father, sc)
             return
         # list new neighbors
         newNeighbors = []
@@ -100,7 +135,7 @@ def BFS(g: Graph, sc: pygame.Surface):
                 father[neighbor.value] = currentNode.value
                 if neighbor.value != g.goal.value:
                     neighbor.set_color(red)
-                    g.draw(sc)
+                    drawNode(neighbor, sc)
 
         # add list neighbors to open_set
         open_set.extend(newNeighbors)
@@ -109,26 +144,100 @@ def BFS(g: Graph, sc: pygame.Surface):
 def UCS(g: Graph, sc: pygame.Surface):
     print('Implement UCS algorithm')
 
-    open_set = {}
-    open_set[g.start.value] = 0
-    closed_set: list[int] = []
+    open_set = [g.start]
+    closed_set = []
     father = [-1]*g.get_len()
     cost = [100_000]*g.get_len()
     cost[g.start.value] = 0
 
     # TODO: Implement UCS algorithm using open_set, closed_set, and father
-    raise NotImplementedError('Not implemented')
+    
+     # draw start node
+    g.start.set_color(orange)
+    drawNode(g.start, sc)
+    while open_set:
+
+        # draw current node
+        currentNode = getNodeMinCost(open_set, g, cost) # current node cost min
+        currentNode.set_color(yellow)
+        drawNode(currentNode, sc)
+
+        # append closed node
+        closed_set.append(currentNode)
+
+        currentNode.set_color(blue)
+        drawNode(currentNode, sc)
+
+        open_set.remove(currentNode)
+
+        # Check if current node is goal
+        if g.is_goal(currentNode):
+            currentNode.set_color(purple)
+            setColorPath(g, father, sc)
+            return
+        # list new neighbors and update cost
+        newNeighbors = []
+        for neighbor in g.get_neighbors(currentNode):
+            if neighbor not in closed_set and neighbor not in open_set:
+                newNeighbors.append(neighbor)
+                father[neighbor.value] = currentNode.value
+                cost[neighbor.value] = CostTwoNode(currentNode, neighbor) + cost[currentNode.value]
+                if neighbor.value != g.goal.value:
+                    neighbor.set_color(red)
+                    drawNode(neighbor, sc)
+        # add list neighbors to open_set
+        open_set.extend(newNeighbors)
+        
+        
 
 
 def AStar(g: Graph, sc: pygame.Surface):
     print('Implement A* algorithm')
 
-    open_set = {}
-    open_set[g.start.value] = 0
-    closed_set: list[int] = []
+    open_set = [g.start]
+    closed_set = []
     father = [-1]*g.get_len()
     cost = [100_000]*g.get_len()
     cost[g.start.value] = 0
 
     # TODO: Implement A* algorithm using open_set, closed_set, and father
-    raise NotImplementedError('Not implemented')
+    
+    # draw start node
+    g.start.set_color(orange)
+    g.draw(sc)
+    while open_set:
+
+        # draw current node
+        currentNode = getNodeMinCostHeuristic(open_set, g, cost) # current node cost min
+        currentNode.set_color(yellow)
+        #g.draw(sc)
+
+        # append closed node
+        closed_set.append(currentNode)
+
+        currentNode.set_color(blue)
+        g.draw(sc)
+
+        open_set.remove(currentNode)
+
+        # Check if current node is goal
+        if g.is_goal(currentNode):
+            currentNode.set_color(purple)
+            setColorPath(g, father, sc)
+            return
+        # list new neighbors and update cost
+        newNeighbors = []
+        for neighbor in g.get_neighbors(currentNode):
+            if neighbor not in closed_set and neighbor not in open_set:
+                newNeighbors.append(neighbor)
+                father[neighbor.value] = currentNode.value
+                
+                #update cost
+                cost[neighbor.value] = CostTwoNode(currentNode, neighbor) + cost[currentNode.value]
+
+                if neighbor.value != g.goal.value:
+                    neighbor.set_color(red)
+                    g.draw(sc)
+
+        # add list neighbors to open_set
+        open_set.extend(newNeighbors)

@@ -1,4 +1,3 @@
-#from SearchAlgorithms import *
 from SearchAlgorithms import *
 import argparse
 
@@ -11,7 +10,7 @@ def main(algo:str, start_pos:int, goal_pos:int):
 
     g = Graph(start_pos, goal_pos)
     g.draw(sc)
-    clock.tick(500)
+    clock.tick(200)
 
     if algo == 'DFS':
         DFS(g, sc)
