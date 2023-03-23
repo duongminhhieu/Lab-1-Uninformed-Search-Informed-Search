@@ -17,8 +17,8 @@ def setColorPath(g: Graph, path, sc: pygame.surface):
     g.start.set_color(orange)
     drawNode(g.start, sc)
 
-def CostTwoNode(a: Node, b: Node):
-    cost = math_.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y))
+def costTwoNode(a: Node, b: Node):
+    cost = math_.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
     return cost
 
 
@@ -37,7 +37,7 @@ def getHeuristic(g: Graph, a: Node):
     return cost
 
 def getNodeMinCostHeuristic(open_set: list[Node], g: Graph, cost: list[Node]):
-    min = 10**8 
+    min = 10**8
     temp = open_set[0] # temp = first node
     for i in open_set:
         if (cost[i.value] + getHeuristic(g, i)) < min:
@@ -181,7 +181,7 @@ def UCS(g: Graph, sc: pygame.Surface):
             if neighbor not in closed_set and neighbor not in open_set:
                 newNeighbors.append(neighbor)
                 father[neighbor.value] = currentNode.value
-                cost[neighbor.value] = CostTwoNode(currentNode, neighbor) + cost[currentNode.value]
+                cost[neighbor.value] = costTwoNode(currentNode, neighbor) + cost[currentNode.value]
                 if neighbor.value != g.goal.value:
                     neighbor.set_color(red)
                     drawNode(neighbor, sc)
@@ -204,19 +204,19 @@ def AStar(g: Graph, sc: pygame.Surface):
     
     # draw start node
     g.start.set_color(orange)
-    g.draw(sc)
+    drawNode(g.start, sc)
     while open_set:
 
         # draw current node
         currentNode = getNodeMinCostHeuristic(open_set, g, cost) # current node cost min
         currentNode.set_color(yellow)
-        #g.draw(sc)
+        drawNode(currentNode, sc)
 
         # append closed node
         closed_set.append(currentNode)
 
         currentNode.set_color(blue)
-        g.draw(sc)
+        drawNode(currentNode, sc)
 
         open_set.remove(currentNode)
 
@@ -233,11 +233,11 @@ def AStar(g: Graph, sc: pygame.Surface):
                 father[neighbor.value] = currentNode.value
                 
                 #update cost
-                cost[neighbor.value] = CostTwoNode(currentNode, neighbor) + cost[currentNode.value]
+                cost[neighbor.value] = cost[currentNode.value] + costTwoNode(currentNode, neighbor) 
 
                 if neighbor.value != g.goal.value:
                     neighbor.set_color(red)
-                    g.draw(sc)
+                    drawNode(neighbor, sc)
 
         # add list neighbors to open_set
-        open_set.extend(newNeighbors)
+        open_set = (newNeighbors)
