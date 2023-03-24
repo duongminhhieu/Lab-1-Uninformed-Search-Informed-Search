@@ -241,3 +241,52 @@ def AStar(g: Graph, sc: pygame.Surface):
 
         # add list neighbors to open_set
         open_set = (newNeighbors)
+
+def IDDFS(g: Graph, sc: pygame.Surface):
+    print('Implement IDDFS algorithm')
+
+
+    father = [-1]*g.get_len()
+    depth = 0
+    # TODO: Implement DFS algorithm using open_set, closed_set, and father
+
+    # draw start node
+    g.start.set_color(orange)
+    drawNode(g.start, sc)
+    while True:
+        open_set = [(g.start, 0)]
+        closed_set = []
+        while open_set:
+
+            # draw current node
+            (currentNode, currentDepth) = open_set.pop(0)
+            currentNode.set_color(yellow)
+            drawNode(currentNode, sc)
+
+            # append closed node
+            closed_set.append(currentNode)
+
+            currentNode.set_color(blue)
+            drawNode(currentNode, sc)
+
+            # Check if current node is goal
+            if g.is_goal(currentNode):
+                currentNode.set_color(purple)
+                setColorPath(g, father, sc)
+                return
+
+            if currentDepth > depth:
+                continue
+            # list new neighbors
+            newNeighbors = []
+            for neighbor in g.get_neighbors(currentNode):
+                if neighbor not in closed_set and neighbor not in open_set:
+                    if neighbor.value != g.goal.value:
+                        neighbor.set_color(red)
+                        drawNode(neighbor, sc)
+                    father[neighbor.value] = currentNode.value
+                    newNeighbors.append((neighbor, currentDepth + 1))
+
+            # add list neighbors to open_set
+            open_set[:0] = newNeighbors
+        depth += 1

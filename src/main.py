@@ -20,6 +20,8 @@ def main(algo:str, start_pos:int, goal_pos:int):
         UCS(g, sc)
     elif algo == 'AStar':
         AStar(g, sc)
+    elif algo == 'IDDFS':
+        IDDFS(g, sc)
     else:
         raise NotImplementedError('Not implemented')
 
